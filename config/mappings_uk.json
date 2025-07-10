@@ -1,0 +1,16 @@
+{
+    "column_mapping": {
+        "middle_initials": "middle_name"
+    },
+
+    "education_mapping": {
+        "1": "Vocational Qualification Level 1",
+        "2": "Vocational Qualification Level 2",
+        "3": "A Level",
+        "4": "Higher National Certificate",
+        "5": "Higher National Diploma",
+        "6": "Bachelor’s Degree",
+        "7": "Master’s Degree",
+        "8": "Doctorate Degree"
+    }
+}
