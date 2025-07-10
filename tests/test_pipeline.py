@@ -1,7 +1,4 @@
-import sys
-import os
 import datetime
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from pipeline.data_utils import clean_salary, hash_password, clean_gender, infer_dob
 
 

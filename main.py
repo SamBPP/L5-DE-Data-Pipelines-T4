@@ -1,9 +1,11 @@
 import sqlite3
 import subprocess
+from tests import validation
 from pipeline.transform import transform_users, validate_user_visits
 from pipeline.database import update_users_table, update_login_table
 from pipeline.config_loader import load_json_config
 from pipeline.load_data import load_user_data, load_login_data
+
 
 def main():
     uk_config = load_json_config('mappings_uk.json')
