@@ -1,4 +1,13 @@
 {
+    "label": "SC",
+    "timezone": "Europe/London",
+    "user_path": "data/SC User Data.csv",
+    "login_path": "data/SC-User-LoginTS.csv",
+    "encoding": "utf-8",
+    "payment_period": 1,
+    "int_dial_code": "44",
+    "currency": "GBP",
+
     "column_mapping": {
         "town": "city",
         "district": "county",

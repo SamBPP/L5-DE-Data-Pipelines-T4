@@ -1,4 +1,12 @@
 {
+    "label": "FR",
+    "timezone": "Europe/Paris",
+    "user_path": "data/FR User Data.csv",
+    "login_path": "data/FR-User-LoginTS.csv",
+    "payment_period": 12,
+    "int_dial_code": "33",
+    "currency": "EUR",
+
     "column_mapping": {
         "prénom": "first_name",
         "nom_de_famille": "surname",

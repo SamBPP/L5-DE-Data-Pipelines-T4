@@ -26,7 +26,7 @@ def transform_users(df, country_code, column_mapping=None, gender_mapping=None,
                     int_dial_code='44', currency='GBP'):
     logger.info("Transforming user data...")
     df = tidy_columns(df, column_mapping)
-    df['gender'] = df['gender'].astype(object)
+    df['gender'] = df['gender'].astype(str)
     df['dob'] = df.apply(lambda row: infer_dob(row['dob'], row['age_last_birthday']), axis=1)
     df['password'] = df['password'].apply(hash_password)
 

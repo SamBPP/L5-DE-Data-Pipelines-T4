@@ -1,7 +1,12 @@
 {
-    "column_mapping": {
-        "middle_initials": "middle_name"
-    },
+    "label": "UK",
+    "timezone": "Europe/London",
+    "user_path": "data/UK User Data.csv",
+    "login_path": "data/UK-User-LoginTS.csv",
+    "encoding": "latin1",
+    "payment_period": 1,
+    "int_dial_code": "44",
+    "currency": "GBP",
 
     "education_mapping": {
         "1": "Vocational Qualification Level 1",

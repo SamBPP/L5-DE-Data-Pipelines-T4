@@ -1,6 +1,14 @@
 {
+    "label": "USA",
+    "timezone": "US/Eastern",
+    "user_path": "data/USA User Data.csv",
+    "login_path": "data/USA-User-LoginTS.csv",
+    "payment_period": 1,
+    "int_dial_code": "1",
+    "currency": "USD",
+    "encoding": "utf-8",
+    
     "column_mapping": {
-        "middle_initials": "middle_name",
         "last_name": "surname",
         "favorite_color": "favourite_colour",
         "favorite_animal": "favourite_animal",

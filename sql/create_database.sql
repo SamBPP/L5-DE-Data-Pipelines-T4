@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     first_name TEXT NOT NULL,
     surname TEXT NOT NULL,
+    middle_initials TEXT,
     middle_name TEXT,
     dob DATE,
     age_last_birthday INTEGER,

@@ -1,66 +1,69 @@
+"""main.py
+This script orchestrates the data pipeline for user and login data across multiple countries.
+It loads configurations, processes data, validates it, and inserts it into a SQLite database.
+"""
 import sqlite3
 import subprocess
 from tests import validation
-from pipeline.transform import transform_users, validate_user_visits
+from pipeline.transform import transform_users
 from pipeline.database import update_users_table, update_login_table
 from pipeline.config_loader import load_json_config
 from pipeline.load_data import load_user_data, load_login_data
 
+def process_country(config):
+    """Process user and login data for a specific country based on the provided configuration."""
+    users = load_user_data(config.get('user_path'), encoding=config.get('encoding', 'utf-8'))
+    logins = load_login_data(config.get('login_path'), config.get('timezone'))
 
-def main():
+    users = transform_users(users,
+                            country_code=config.get('label'),
+                            column_mapping=config.get('column_mapping'),
+                            gender_mapping=config.get('gender_mapping'),
+                            education_mapping=config.get('education_mapping'),
+                            payment_period=config.get('payment_period', 1),
+                            int_dial_code=config.get('int_dial_code', '44'),
+                            currency=config.get('currency', 'GBP'))
+
+    validation.validate_user_visits(users, logins)
+    validation.check_duplicates(users,
+                                subset=['email'],
+                                label=f"{config.get('label')} users")
+    validation.validate_email_uniqueness(users,
+                                         label=f"{config.get('label')} users")
+    validation.check_required_columns(logins,
+                                      ['username', 'login_timestamp'],
+                                      label=f"{config.get('label')} logins")
+
+    return users, logins
+
+def insert_all_to_db(conn, user_sets, login_sets):
+    """Insert all user and login data into the database."""
+    for df in user_sets:
+        update_users_table(df, conn)
+    for df in login_sets:
+        update_login_table(df, conn)
+
+
+def run_pipeline():
+    """Run the entire data processing pipeline."""
     uk_config = load_json_config('mappings_uk.json')
     fr_config = load_json_config('mappings_fr.json')
     usa_config = load_json_config('mappings_usa.json')
-    sc_config = load_json_config('mappings_sc.json')
 
-    users_uk = load_user_data('data/UK User Data.csv', encoding='latin1')
-    users_uk = transform_users(users_uk, 'UK',
-                               column_mapping=uk_config['column_mapping'],
-                               education_mapping=uk_config['education_mapping'],
-                               currency='GBP')
-    logins_uk = load_login_data('data/UK-User-LoginTS.csv', 'Europe/London')
-    validate_user_visits(users_uk, logins_uk)
+    users_uk, logins_uk = process_country(uk_config)
 
-    users_fr = load_user_data('data/FR User Data.csv')
-    users_fr = transform_users(users_fr, 'FR',
-                               column_mapping=fr_config['column_mapping'],
-                               gender_mapping=fr_config['gender_mapping'],
-                               education_mapping=fr_config['education_mapping'],
-                               payment_period=12,
-                               currency='EUR',
-                               int_dial_code='+33')
-    logins_fr = load_login_data('data/FR-User-LoginTS.csv', 'Europe/Paris')
-    validate_user_visits(users_fr, logins_fr)
+    users_fr, logins_fr = process_country(fr_config)
 
-    users_usa = load_user_data('data/USA User Data.csv')
-    users_usa = transform_users(users_usa, 'USA',
-                                column_mapping=usa_config['column_mapping'],
-                                gender_mapping=usa_config['gender_mapping'],
-                                education_mapping=usa_config['education_mapping'],
-                                currency='USD',
-                                int_dial_code='+1')
-    logins_usa = load_login_data('data/USA-User-LoginTS.csv', 'US/Eastern')
-    validate_user_visits(users_usa, logins_usa)
-
-    users_sc = load_user_data('data/SC User Data.csv')
-    users_sc = transform_users(users_sc, 'SC',
-                               column_mapping=sc_config['column_mapping'],
-                               gender_mapping=sc_config['gender_mapping'],
-                               education_mapping=sc_config['education_mapping'],
-                               currency='GBP')
-    logins_sc = load_login_data('data/SC-User-LoginTS.csv', 'Europe/London')
-    validate_user_visits(users_sc, logins_sc)
+    users_usa, logins_usa = process_country(usa_config)
 
     subprocess.run("sqlite3 customers.db < sql/create_database.sql", shell=True, check=True)
     conn = sqlite3.connect("customers.db")
 
-    for df in [users_uk, users_fr, users_usa, users_sc]:
-        update_users_table(df, conn)
-
-    for df in [logins_uk, logins_fr, logins_usa, logins_sc]:
-        update_login_table(df, conn)
+    insert_all_to_db(conn,
+                     user_sets=[users_uk, users_fr, users_usa],
+                     login_sets=[logins_uk, logins_fr, logins_usa])
 
     conn.close()
 
 if __name__ == "__main__":
-    main()
+    run_pipeline()
